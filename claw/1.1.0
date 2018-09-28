@@ -1,0 +1,46 @@
+#%Module1.0#####################################################################
+##
+##
+
+proc ModulesHelp { } {
+    puts stderr "CLAW Compiler"
+}
+
+set hostname [info hostname]
+if {[regexp {daint.*} $hostname]} {
+    set machine "daint"
+} elseif {[regexp {kesch.*} $hostname]} {
+    set machine "kesch"
+} elseif {[regexp {tave.*} $hostname]} {
+    set machine "tave"
+} else {
+    puts stderr "This machine is not supported!"
+    exit 1
+}
+
+if {"$env(PE_ENV)" == "CRAY"} {
+   set preprocessor "cray"
+} elseif {"$env(PE_ENV)" == "PGI"} {
+   set preprocessor "pgi"
+} elseif {"$env(PE_ENV)" == "INTEL"} {
+   set preprocessor "intel"
+} elseif {"$env(PE_ENV)" == "GNU"} {
+   set preprocessor "gnu"
+} elseif {"$env(PE_ENV)" == ""} {
+    puts stderr "Programming environment must be loaded first!"
+    exit 1
+} else {
+    puts stderr "No CLAW Compiler for this PrgEnv"
+    exits 1
+}
+
+set claw_install_path /project/c14/install/$machine/claw_v1.1.0/$preprocessor/
+
+conflict     claw
+
+prepend-path PATH $claw_install_path/bin
+
+setenv       CLAWFC $claw_install_path/bin/clawfc
+setenv       CLAW_VERSION 1.1.0
+
+module-whatis   "CLAW Compiler"
